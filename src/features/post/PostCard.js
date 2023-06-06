@@ -57,22 +57,23 @@ function PostCard({ post }) {
         }
         action={
           <>
-            <IconButton onClick={handleEditModalOpen}>
+             <IconButton onClick={handleEditModalOpen}>
               <EditIcon sx={{ fontSize: 20 }} />
             </IconButton>
             <PostDelete postId={post._id} />
-            {isEditModalOpen && (
+          </>
+        }
+      />
+
+
+      <Stack spacing={2} sx={{ p: 3 }}>
+      {isEditModalOpen && (
               <PostEdit
                 postId={post._id}
                 initialContent={post.content}
                 onClose={handleEditModalClose}
               />
             )}
-          </>
-        }
-      />
-
-      <Stack spacing={2} sx={{ p: 3 }}>
         <Typography>{post.content}</Typography>
 
         {post.image && (
