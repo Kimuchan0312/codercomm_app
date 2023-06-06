@@ -8,6 +8,7 @@ const initialState = {
   currentPageUsers: [],
   usersById: {},
   totalPages: 1,
+  sentRequests: [],
 };
 
 const slice = createSlice({
@@ -89,6 +90,17 @@ const slice = createSlice({
       state.error = null;
       const { targetUserId } = action.payload;
       state.usersById[targetUserId].friendship = null;
+    },
+
+    getSentFriendRequestsSuccess(state, action) {
+      state.isLoading = false;
+      state.error = null;
+
+      const { users, count, totalPages } = action.payload;
+      users.forEach((user) => (state.usersById[user._id] = user));
+      state.currentPageUsers = users.map((user) => user._id);
+      state.totalUsers = count;
+      state.totalPages = totalPages;
     },
   },
 });
@@ -219,3 +231,21 @@ export const removeFriend = (targetUserId) => async (dispatch) => {
     toast.error(error.message);
   }
 };
+
+export const getSentFriendRequests =
+  ({ filterName, page = 1, limit = 12 }) =>
+  async (dispatch) => {
+    dispatch(slice.actions.startLoading());
+    try {
+      const params = { page, limit };
+      if (filterName) params.name = filterName;
+      const response = await apiService.get("/friends/requests/outgoing", {
+        params,
+      });
+      dispatch(slice.actions.getSentFriendRequestsSuccess(response.data));
+    } catch (error) {
+      dispatch(slice.actions.hasError(error.message));
+      toast.error(error.message);
+    }
+  };
+

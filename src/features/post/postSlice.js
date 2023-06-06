@@ -59,6 +59,30 @@ const slice = createSlice({
       const { postId, reactions } = action.payload;
       state.postsById[postId].reactions = reactions;
     },
+
+    deletePostSuccess(state, action) {
+      state.isLoading = false;
+      state.error = null;
+      const postId = action.payload;
+      delete state.postsById[postId];
+      state.currentPagePosts = state.currentPagePosts.filter(
+        (id) => id !== postId
+      );
+    },
+
+    editPostSuccess(state, action) {
+      state.isLoading = false;
+      state.error = null;
+      const { postId, updatedPost } = action.payload;
+      state.postsById[postId] = updatedPost;
+      state.currentPagePosts = state.currentPagePosts.map((id) => {
+        if (id === postId) {
+          return updatedPost._id;
+        }
+        return id;
+      });
+    }
+
   },
 });
 
@@ -122,3 +146,30 @@ export const sendPostReaction =
       toast.error(error.message);
     }
   };
+
+export const deletePost = (postId) => async (dispatch) => {
+  dispatch(slice.actions.startLoading());
+  try {
+    await apiService.delete(`/posts/${postId}`);
+    dispatch(slice.actions.deletePostSuccess(postId));
+    toast.success("Post deleted successfully");
+  } catch (error) {
+    dispatch(slice.actions.hasError(error.message));
+    toast.error(error.message);
+  }
+};
+
+export const editPost =
+  ({ postId, content }) =>
+  async (dispatch) => {
+    dispatch(slice.actions.startLoading());
+    try {
+      const response = await apiService.put(`/posts/${postId}`, { content });
+      dispatch(slice.actions.editPostSuccess({ postId, updatedPost: response.data }));
+      toast.success("Post edited successfully");
+    } catch (error) {
+      dispatch(slice.actions.hasError(error.message));
+      toast.error(error.message);
+    }
+  };
+

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Link,
@@ -11,13 +11,24 @@ import {
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { fDate } from "../../utils/formatTime";
-
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import PostDelete from "./PostDelete";
 import PostReaction from "./PostReaction";
 import CommentForm from "../comment/CommentForm";
 import CommentList from "../comment/CommentList";
+import PostEdit from "./PostEdit";
+import EditIcon from "@mui/icons-material/Edit";
 
 function PostCard({ post }) {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const handleEditModalOpen = () => {
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditModalClose = () => {
+    setIsEditModalOpen(false);
+  };
+
   return (
     <Card>
       <CardHeader
@@ -45,9 +56,19 @@ function PostCard({ post }) {
           </Typography>
         }
         action={
-          <IconButton>
-            <MoreVertIcon sx={{ fontSize: 30 }} />
-          </IconButton>
+          <>
+            <IconButton onClick={handleEditModalOpen}>
+              <EditIcon sx={{ fontSize: 20 }} />
+            </IconButton>
+            <PostDelete postId={post._id} />
+            {isEditModalOpen && (
+              <PostEdit
+                postId={post._id}
+                initialContent={post.content}
+                onClose={handleEditModalClose}
+              />
+            )}
+          </>
         }
       />
 

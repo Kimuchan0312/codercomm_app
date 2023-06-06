@@ -5,17 +5,18 @@ import {
   Card,
   Box,
   Pagination,
-  Grid,
   Container,
+  TablePagination,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { getFriendRequests } from "./friendSlice";
-import UserCard from "./UserCard";
+import { getSentFriendRequests } from "./friendSlice";
 import SearchInput from "../../components/SearchInput";
+import UserTable from "./UserTable";
 
-function FriendRequests() {
+function SentFriendRequests() {
   const [filterName, setFilterName] = useState("");
-  const [page, setPage] = React.useState(1);
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const { currentPageUsers, usersById, totalUsers, totalPages } = useSelector(
     (state) => state.friend
@@ -23,18 +24,27 @@ function FriendRequests() {
   const users = currentPageUsers.map((userId) => usersById[userId]);
   const dispatch = useDispatch();
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   const handleSubmit = (searchQuery) => {
     setFilterName(searchQuery);
   };
 
   useEffect(() => {
-    dispatch(getFriendRequests({ filterName, page }));
+    dispatch(getSentFriendRequests({ filterName, page }));
   }, [filterName, page, dispatch]);
 
   return (
     <Container>
       <Typography variant="h4" sx={{ mb: 3 }}>
-        Friend Requests
+        Sent Friend Requests
       </Typography>
       <Card sx={{ p: 3 }}>
         <Stack spacing={2}>
@@ -58,18 +68,26 @@ function FriendRequests() {
               onChange={(e, page) => setPage(page)}
             />
           </Stack>
-        </Stack>
-
-        <Grid container spacing={3} my={1}>
-          {users.map((user) => (
-            <Grid key={user._id} item xs={12} md={4}>
-              <UserCard profile={user} />
-            </Grid>
-          ))}
-        </Grid>
+          <TablePagination
+              sx={{
+                "& .MuiTablePagination-selectLabel, .MuiTablePagination-select, .MuiTablePagination-selectIcon":
+                  {
+                    display: { xs: "none", md: "block" },
+                  },
+              }}
+              component="div"
+              count={totalUsers ? totalUsers : 0}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              rowsPerPageOptions={[5, 10, 25]}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Stack>
+          <UserTable users={users} />
       </Card>
     </Container>
   );
 }
 
-export default FriendRequests;
+export default SentFriendRequests;
