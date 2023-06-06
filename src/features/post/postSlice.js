@@ -74,14 +74,16 @@ const slice = createSlice({
       state.isLoading = false;
       state.error = null;
       const { postId, updatedPost } = action.payload;
-      state.postsById[postId] = updatedPost;
+      const existingPost = state.postsById[postId];
+      state.postsById[postId] = { ...existingPost, ...updatedPost };
+      state.postsById[postId].author = existingPost.author; // Preserve the author object
       state.currentPagePosts = state.currentPagePosts.map((id) => {
         if (id === postId) {
           return updatedPost._id;
         }
         return id;
       });
-    }
+    },
 
   },
 });
@@ -160,11 +162,18 @@ export const deletePost = (postId) => async (dispatch) => {
 };
 
 export const editPost =
-  ({ postId, content }) =>
-  async (dispatch) => {
-    dispatch(slice.actions.startLoading());
-    try {
-      const response = await apiService.put(`/posts/${postId}`, { content });
+({ postId, content, image }) =>
+async (dispatch) => {
+  dispatch(slice.actions.startLoading());
+  try {
+    let imageUrl;
+    if (image) {
+      imageUrl = await cloudinaryUpload(image);
+    }
+    const response = await apiService.put(`/posts/${postId}`, {
+      content,
+      image: imageUrl,
+    });
       dispatch(slice.actions.editPostSuccess({ postId, updatedPost: response.data }));
       toast.success("Post edited successfully");
     } catch (error) {
@@ -172,4 +181,12 @@ export const editPost =
       toast.error(error.message);
     }
   };
+
+
+
+
+
+
+
+
 

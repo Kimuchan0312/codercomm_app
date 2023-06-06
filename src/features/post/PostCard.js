@@ -72,6 +72,7 @@ function PostCard({ post }) {
                 postId={post._id}
                 initialContent={post.content}
                 onClose={handleEditModalClose}
+                author={post.author} 
               />
             )}
         <Typography>{post.content}</Typography>

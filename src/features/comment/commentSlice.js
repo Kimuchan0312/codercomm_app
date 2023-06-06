@@ -59,6 +59,7 @@ const slice = createSlice({
       for (const postId in state.commentsByPost) {
         const commentIds = state.commentsByPost[postId];
         state.commentsByPost[postId] = commentIds.filter((id) => id !== commentId);
+        state.totalCommentsByPost[postId] = state.commentsByPost[postId].length;
       }
       delete state.commentsById[commentId];
     },

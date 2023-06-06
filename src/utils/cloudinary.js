@@ -1,4 +1,3 @@
-import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET } from "../app/config";
 import axios from "axios";
 
 export const cloudinaryUpload = async (image) => {
@@ -6,9 +5,9 @@ export const cloudinaryUpload = async (image) => {
   try {
     const formData = new FormData();
     formData.append("file", image);
-    formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+    formData.append("upload_preset", 'coder_comm');
     const response = await axios({
-      url: `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+      url: `https://api.cloudinary.com/v1_1/dwn5h0kwn/image/upload`,
       method: "POST",
       data: formData,
       headers: { "Content-Type": "multipart/form-data" },
